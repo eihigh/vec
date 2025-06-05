@@ -1,5 +1,7 @@
 # vec
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/eihigh/vec.svg)](https://pkg.go.dev/github.com/eihigh/vec)
+
 A Go vector math library with generic types.
 
 ## Quick Start
