@@ -17,7 +17,7 @@ e := a.Normalize()   // unit vector
 
 // Different types
 vi := vec.Vec2i{10, 20}  // int vectors
-vf := vec.Vec2{3.14, 2.71}  // float64 vectors (default)
+vf := vec.Vec2g[float32]{10.5, 20.5} // generic vectors
 ```
 
 ## Features
