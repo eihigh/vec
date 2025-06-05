@@ -20,6 +20,49 @@ vi := vec.Vec2i{10, 20}  // int vectors
 vf := vec.Vec2{3.14, 2.71}  // float64 vectors (default)
 ```
 
+## Features
+
+### Functional Composition
+
+Combine vectors with any function using `Map`, `Map2`, and `Apply`:
+
+```go
+v := vec.Vec2{-1.5, 2.7}
+v.Map(math.Abs)    // {1.5, 2.7}
+v.Map(math.Floor)  // {-2, 2}
+
+a := vec.Vec2{10, 20}
+b := vec.Vec2{3, 7}
+a.Map2(b, math.Max)  // {10, 20}
+```
+
+### Component Unpacking
+
+Pass vector components directly to multi-argument functions:
+
+```go
+v := vec.Vec2{3, 4}
+hypot := math.Hypot(v.XY())  // 5.0
+
+// Works with any function expecting x, y
+func drawPoint(x, y float64) { /* ... */ }
+drawPoint(v.XY())
+```
+
+### Type Interoperability
+
+Package functions accept any struct with matching components:
+
+```go
+import "image"
+
+p := image.Point{X: 10, Y: 20}
+q := image.Point{X: 3, Y: 4}
+
+// Use standard library types with vec functions
+d := vec.Dot2(p, q)  // 110
+```
+
 ## Notes
 
 ### Methods vs Package Functions
@@ -69,24 +112,6 @@ The 2D cross product returns a scalar (signed area):
 a := vec.Vec2{3, 0}
 b := vec.Vec2{0, 4}
 vec.Cross2(a, b)  // returns 12.0 (float64)
-```
-
-### Functional Programming Support
-
-Unique to game math libraries, vec supports functional operations:
-
-```go
-v := vec.Vec2{-1.5, 2.7}
-v.Map(math.Abs)  // {1.5, 2.7}
-
-a := vec.Vec2{10, 20}
-b := vec.Vec2{3, 7}
-a.Map2(b, math.Max)  // {10, 20}
-
-// Swap components
-v.Apply(func(x, y float64) (float64, float64) {
-    return y, x
-})
 ```
 
 ## Examples
