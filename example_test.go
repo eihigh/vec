@@ -2,6 +2,7 @@ package vec_test
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 
 	"github.com/eihigh/vec"
@@ -116,11 +117,12 @@ func Example_constructorsAndUtilities() {
 	fmt.Printf("Splat2(5) = %v\n", vec.Splat2(5))
 
 	// Type conversions
-	v := vec.Vec2{3.7, 4.2}
+	v := vec.Vec2{-3.7, 4.2}
 	fmt.Println("\nType conversions:")
 	fmt.Printf("Original: %v\n", v)
 	fmt.Printf("To int: %v\n", v.Int())
 	fmt.Printf("To float32: %v\n", v.Float32())
+	fmt.Printf("To uint8: %v\n", vec.Cast2[uint8](v))
 
 	// Dimension conversions
 	v2 := vec.Vec2{1, 2}
@@ -145,11 +147,11 @@ func Example_constructorsAndUtilities() {
 	v6 := vec.Vec2{3, 7}
 	fmt.Printf("Map2(Max): %v, %v -> %v\n", v5, v6, v5.Map2(v6, math.Max))
 
-	// Apply for swapping components
-	swapped := v2.Apply(func(x, y float64) (float64, float64) {
-		return y, x
-	})
-	fmt.Printf("Apply(swap): %v -> %v\n", v2, swapped)
+	// Apply a function to the vector
+	// that takes multiple scalars (e.g., color conversion)
+	rgb := vec.Vec3g[uint8]{255, 128, 64}
+	ycbcr := rgb.Apply(color.RGBToYCbCr)
+	fmt.Printf("Apply(RGBToYCbCr): %v -> %v\n", rgb, ycbcr)
 
 	// Output:
 	// Constructors:
@@ -157,9 +159,10 @@ func Example_constructorsAndUtilities() {
 	// Splat2(5) = {5 5}
 	//
 	// Type conversions:
-	// Original: {3.7 4.2}
-	// To int: {3 4}
-	// To float32: {3.7 4.2}
+	// Original: {-3.7 4.2}
+	// To int: {-3 4}
+	// To float32: {-3.7 4.2}
+	// To uint8: {253 4}
 	//
 	// Dimension conversions:
 	// 2D to 3D: {1 2} -> {1 2 3}
@@ -173,5 +176,5 @@ func Example_constructorsAndUtilities() {
 	// Functional operations:
 	// Map(Abs): {-1.5 2.7} -> {1.5 2.7}
 	// Map2(Max): {10 20}, {3 7} -> {10 20}
-	// Apply(swap): {1 2} -> {2 1}
+	// Apply(RGBToYCbCr): {255 128 64} -> {159 75 197}
 }

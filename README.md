@@ -36,6 +36,9 @@ v.Map(math.Floor)  // {-2, 2}
 a := vec.Vec2{10, 20}
 b := vec.Vec2{3, 7}
 a.Map2(b, math.Max)  // {10, 20}
+
+rgb := vec.Vec3g[uint8]{255, 128, 64}
+rgb.Apply(color.RGBToYCbCr) // {159 75 197}
 ```
 
 ### Component Unpacking
@@ -172,6 +175,9 @@ vec.Reflect2(v, normal)  // reflect v off surface
 v := vec.Vec2{3.7, 4.2}
 v.Int()     // vec.Vec2i{3, 4}
 v.Float32() // vec.Vec2g[float32]{3.7, 4.2}
+
+// Generic vector conversions
+vec.Cast2[uint8](v) // vec.Vec2g[uint8]{3, 4}
 
 // Dimension conversions
 v2 := vec.Vec2{1, 2}

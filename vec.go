@@ -76,6 +76,21 @@ func Splat3[S Scalar](x S) Vec3g[S] { return Vec3g[S]{x, x, x} }
 // Splat4 creates a 4D vector with all components set to x.
 func Splat4[S Scalar](x S) Vec4g[S] { return Vec4g[S]{x, x, x, x} }
 
+// Cast2 converts a 2D vector from type S to type T.
+func Cast2[T, S Scalar](v Vec2g[S]) Vec2g[T] {
+	return Vec2g[T]{T(v.X), T(v.Y)}
+}
+
+// Cast3 converts a 3D vector from type S to type T.
+func Cast3[T, S Scalar](v Vec3g[S]) Vec3g[T] {
+	return Vec3g[T]{T(v.X), T(v.Y), T(v.Z)}
+}
+
+// Cast4 converts a 4D vector from type S to type T.
+func Cast4[T, S Scalar](v Vec4g[S]) Vec4g[T] {
+	return Vec4g[T]{T(v.X), T(v.Y), T(v.Z), T(v.W)}
+}
+
 // XY returns the x, y components.
 func (a Vec2g[S]) XY() (x, y S) { return a.X, a.Y }
 
