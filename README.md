@@ -72,7 +72,7 @@ d := vec.Dot2(p, q)  // 110
 
 ### Methods vs Package Functions
 
-Basic operations are methods, while geometric operations are package functions:
+Arithmetic and single-vector operations are methods; other multi-vector operations are package functions:
 
 ```go
 // Methods: arithmetic and vector properties
@@ -80,7 +80,7 @@ v.Add(w)      // vector arithmetic
 v.Len()       // length
 v.Normalize() // normalization
 
-// Package functions: geometric operations
+// Package functions: other multi-vector operations
 vec.Dot2(a, b)     // dot product
 vec.Cross3(a, b)   // cross product
 vec.Lerp2(a, b, t) // interpolation
