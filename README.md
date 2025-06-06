@@ -26,19 +26,19 @@ vf := vec.Vec2g[float32]{10.5, 20.5} // generic vectors
 
 ### Functional Composition
 
-Combine vectors with any function using `Map`, `Map2`, and `Apply`:
+Transform vectors with any function using `Map`, `Zip`, and `Apply`:
 
 ```go
 v := vec.Vec2{-1.5, 2.7}
-v.Map(math.Abs)    // {1.5, 2.7}
-v.Map(math.Floor)  // {-2, 2}
+vec.Map2(v, math.Abs)    // {1.5, 2.7}
+vec.Map2(v, math.Floor)  // {-2, 2}
 
 a := vec.Vec2{10, 20}
 b := vec.Vec2{3, 7}
-a.Map2(b, math.Max)  // {10, 20}
+vec.Zip2(a, b, math.Max)  // {10, 20}
 
 rgb := vec.Vec3g[uint8]{255, 128, 64}
-rgb.Apply(color.RGBToYCbCr) // {159 75 197}
+vec.Apply3(rgb, color.RGBToYCbCr) // {159 75 197}
 ```
 
 ### Component Unpacking

@@ -77,18 +77,21 @@ func Splat3[S Scalar](x S) Vec3g[S] { return Vec3g[S]{x, x, x} }
 func Splat4[S Scalar](x S) Vec4g[S] { return Vec4g[S]{x, x, x, x} }
 
 // Cast2 converts a 2D vector from type S to type T.
-func Cast2[T, S Scalar](v Vec2g[S]) Vec2g[T] {
-	return Vec2g[T]{T(v.X), T(v.Y)}
+func Cast2[T, S Scalar, V Vec2like[S]](v V) Vec2g[T] {
+	vv := Vec2g[S](v)
+	return Vec2g[T]{T(vv.X), T(vv.Y)}
 }
 
 // Cast3 converts a 3D vector from type S to type T.
-func Cast3[T, S Scalar](v Vec3g[S]) Vec3g[T] {
-	return Vec3g[T]{T(v.X), T(v.Y), T(v.Z)}
+func Cast3[T, S Scalar, V Vec3like[S]](v V) Vec3g[T] {
+	vv := Vec3g[S](v)
+	return Vec3g[T]{T(vv.X), T(vv.Y), T(vv.Z)}
 }
 
 // Cast4 converts a 4D vector from type S to type T.
-func Cast4[T, S Scalar](v Vec4g[S]) Vec4g[T] {
-	return Vec4g[T]{T(v.X), T(v.Y), T(v.Z), T(v.W)}
+func Cast4[T, S Scalar, V Vec4like[S]](v V) Vec4g[T] {
+	vv := Vec4g[S](v)
+	return Vec4g[T]{T(vv.X), T(vv.Y), T(vv.Z), T(vv.W)}
 }
 
 // XY returns the x, y components.
@@ -183,48 +186,6 @@ func (a Vec3g[S]) Slice() []S { return []S{a.X, a.Y, a.Z} }
 
 // Slice returns components as slice.
 func (a Vec4g[S]) Slice() []S { return []S{a.X, a.Y, a.Z, a.W} }
-
-// Map applies f to each component.
-func (a Vec2g[S]) Map(f func(S) S) Vec2g[S] { return Vec2g[S]{f(a.X), f(a.Y)} }
-
-// Map applies f to each component.
-func (a Vec3g[S]) Map(f func(S) S) Vec3g[S] { return Vec3g[S]{f(a.X), f(a.Y), f(a.Z)} }
-
-// Map applies f to each component.
-func (a Vec4g[S]) Map(f func(S) S) Vec4g[S] { return Vec4g[S]{f(a.X), f(a.Y), f(a.Z), f(a.W)} }
-
-// Map2 applies f to corresponding components of a and b.
-func (a Vec2g[S]) Map2(b Vec2g[S], f func(S, S) S) Vec2g[S] {
-	return Vec2g[S]{f(a.X, b.X), f(a.Y, b.Y)}
-}
-
-// Map2 applies f to corresponding components of a and b.
-func (a Vec3g[S]) Map2(b Vec3g[S], f func(S, S) S) Vec3g[S] {
-	return Vec3g[S]{f(a.X, b.X), f(a.Y, b.Y), f(a.Z, b.Z)}
-}
-
-// Map2 applies f to corresponding components of a and b.
-func (a Vec4g[S]) Map2(b Vec4g[S], f func(S, S) S) Vec4g[S] {
-	return Vec4g[S]{f(a.X, b.X), f(a.Y, b.Y), f(a.Z, b.Z), f(a.W, b.W)}
-}
-
-// Apply transforms all components at once.
-func (a Vec2g[S]) Apply(f func(S, S) (S, S)) Vec2g[S] {
-	x, y := f(a.X, a.Y)
-	return Vec2g[S]{x, y}
-}
-
-// Apply transforms all components at once.
-func (a Vec3g[S]) Apply(f func(S, S, S) (S, S, S)) Vec3g[S] {
-	x, y, z := f(a.X, a.Y, a.Z)
-	return Vec3g[S]{x, y, z}
-}
-
-// Apply transforms all components at once.
-func (a Vec4g[S]) Apply(f func(S, S, S, S) (S, S, S, S)) Vec4g[S] {
-	x, y, z, w := f(a.X, a.Y, a.Z, a.W)
-	return Vec4g[S]{x, y, z, w}
-}
 
 // ===================
 // Math API (package functions)
@@ -392,6 +353,66 @@ func Rotate2[S Scalar, V Vec2like[S]](v V, angle float64) Vec2g[S] {
 		X: S(float64(va.X)*cos - float64(va.Y)*sin),
 		Y: S(float64(va.X)*sin + float64(va.Y)*cos),
 	}
+}
+
+// Map2 applies f to each component of a 2D vector.
+func Map2[S Scalar, V Vec2like[S]](v V, f func(S) S) Vec2g[S] {
+	va := Vec2g[S](v)
+	return Vec2g[S]{f(va.X), f(va.Y)}
+}
+
+// Map3 applies f to each component of a 3D vector.
+func Map3[S Scalar, V Vec3like[S]](v V, f func(S) S) Vec3g[S] {
+	va := Vec3g[S](v)
+	return Vec3g[S]{f(va.X), f(va.Y), f(va.Z)}
+}
+
+// Map4 applies f to each component of a 4D vector.
+func Map4[S Scalar, V Vec4like[S]](v V, f func(S) S) Vec4g[S] {
+	va := Vec4g[S](v)
+	return Vec4g[S]{f(va.X), f(va.Y), f(va.Z), f(va.W)}
+}
+
+// Zip2 applies f to corresponding components of two 2D vectors.
+func Zip2[S Scalar, V Vec2like[S]](a, b V, f func(S, S) S) Vec2g[S] {
+	va := Vec2g[S](a)
+	vb := Vec2g[S](b)
+	return Vec2g[S]{f(va.X, vb.X), f(va.Y, vb.Y)}
+}
+
+// Zip3 applies f to corresponding components of two 3D vectors.
+func Zip3[S Scalar, V Vec3like[S]](a, b V, f func(S, S) S) Vec3g[S] {
+	va := Vec3g[S](a)
+	vb := Vec3g[S](b)
+	return Vec3g[S]{f(va.X, vb.X), f(va.Y, vb.Y), f(va.Z, vb.Z)}
+}
+
+// Zip4 applies f to corresponding components of two 4D vectors.
+func Zip4[S Scalar, V Vec4like[S]](a, b V, f func(S, S) S) Vec4g[S] {
+	va := Vec4g[S](a)
+	vb := Vec4g[S](b)
+	return Vec4g[S]{f(va.X, vb.X), f(va.Y, vb.Y), f(va.Z, vb.Z), f(va.W, vb.W)}
+}
+
+// Apply2 transforms all components of a 2D vector at once.
+func Apply2[S Scalar, V Vec2like[S]](v V, f func(S, S) (S, S)) Vec2g[S] {
+	va := Vec2g[S](v)
+	x, y := f(va.X, va.Y)
+	return Vec2g[S]{x, y}
+}
+
+// Apply3 transforms all components of a 3D vector at once.
+func Apply3[S Scalar, V Vec3like[S]](v V, f func(S, S, S) (S, S, S)) Vec3g[S] {
+	va := Vec3g[S](v)
+	x, y, z := f(va.X, va.Y, va.Z)
+	return Vec3g[S]{x, y, z}
+}
+
+// Apply4 transforms all components of a 4D vector at once.
+func Apply4[S Scalar, V Vec4like[S]](v V, f func(S, S, S, S) (S, S, S, S)) Vec4g[S] {
+	va := Vec4g[S](v)
+	x, y, z, w := f(va.X, va.Y, va.Z, va.W)
+	return Vec4g[S]{x, y, z, w}
 }
 
 // ===================

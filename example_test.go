@@ -141,16 +141,16 @@ func Example_constructorsAndUtilities() {
 	// Functional operations
 	fmt.Println("\nFunctional operations:")
 	v4 := vec.Vec2{-1.5, 2.7}
-	fmt.Printf("Map(Abs): %v -> %v\n", v4, v4.Map(math.Abs))
+	fmt.Printf("Map(Abs): %v -> %v\n", v4, vec.Map2(v4, math.Abs))
 
 	v5 := vec.Vec2{10, 20}
 	v6 := vec.Vec2{3, 7}
-	fmt.Printf("Map2(Max): %v, %v -> %v\n", v5, v6, v5.Map2(v6, math.Max))
+	fmt.Printf("Zip(Max): %v, %v -> %v\n", v5, v6, vec.Zip2(v5, v6, math.Max))
 
 	// Apply a function to the vector
 	// that takes multiple scalars (e.g., color conversion)
 	rgb := vec.Vec3g[uint8]{255, 128, 64}
-	ycbcr := rgb.Apply(color.RGBToYCbCr)
+	ycbcr := vec.Apply3(rgb, color.RGBToYCbCr)
 	fmt.Printf("Apply(RGBToYCbCr): %v -> %v\n", rgb, ycbcr)
 
 	// Output:
@@ -175,6 +175,6 @@ func Example_constructorsAndUtilities() {
 	//
 	// Functional operations:
 	// Map(Abs): {-1.5 2.7} -> {1.5 2.7}
-	// Map2(Max): {10 20}, {3 7} -> {10 20}
+	// Zip(Max): {10 20}, {3 7} -> {10 20}
 	// Apply(RGBToYCbCr): {255 128 64} -> {159 75 197}
 }
