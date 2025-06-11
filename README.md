@@ -15,7 +15,7 @@ b := vec.Vec2{3, 4}
 
 c := a.Add(b)        // {13, 24}
 d := a.Scale(2)      // {20, 40} - scalar multiplication
-e := a.Normalize()   // unit vector
+e := vec.Normalize2(a)   // unit vector
 
 // Different types
 vi := vec.Vec2i{10, 20}  // int vectors
@@ -72,18 +72,20 @@ d := vec.Dot2(p, q)  // 110
 
 ### Methods vs Package Functions
 
-Arithmetic and single-vector operations are methods; other multi-vector operations are package functions:
+Operations that correspond to operators are methods (with both vector and scalar versions), while other operations are package functions:
 
 ```go
-// Methods: arithmetic and vector properties
-v.Add(w)      // vector arithmetic
-v.Len()       // length
-v.Normalize() // normalization
+// Methods: operator-like operations
+v.Add(w)   // vector + vector
+v.Adds(5)  // vector + scalar
+v.Eq(w)    // vector == vector
+v.Eqs(0)   // all components == scalar
 
-// Package functions: other multi-vector operations
+// Package functions: properties and multi-vector operations
+vec.Len2(v)        // length
+vec.Normalize2(v)  // normalization
 vec.Dot2(a, b)     // dot product
 vec.Cross3(a, b)   // cross product
-vec.Lerp2(a, b, t) // interpolation
 ```
 
 ### Scalar Operations with "s" Suffix
@@ -149,9 +151,9 @@ a.Eq(b)    // false
 ```go
 // Length and normalization
 v := vec.Vec2{3, 4}
-v.Len()       // 5.0
-v.LenSq()     // 25
-v.Normalize() // {0.6, 0.8}
+vec.Len2(v)       // 5.0
+vec.LenSq2(v)     // 25
+vec.Normalize2(v) // {0.6, 0.8}
 
 // Dot and cross products
 vec.Dot2(a, b)   // dot product

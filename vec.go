@@ -249,21 +249,21 @@ func Lerp4[S Scalar, V Vec4like[S]](a, b V, t float64) Vec4g[S] {
 // Project2 projects v onto onNormal.
 func Project2[S Scalar, V Vec2like[S]](v, onNormal V) Vec2g[S] {
 	va := Vec2g[S](v)
-	vn := Vec2g[S](onNormal).Normalize()
+	vn := Normalize2(onNormal)
 	return vn.Scale(Dot2(va, vn))
 }
 
 // Project3 projects v onto onNormal.
 func Project3[S Scalar, V Vec3like[S]](v, onNormal V) Vec3g[S] {
 	va := Vec3g[S](v)
-	vn := Vec3g[S](onNormal).Normalize()
+	vn := Normalize3(onNormal)
 	return vn.Scale(Dot3(va, vn))
 }
 
 // Project4 projects v onto onNormal.
 func Project4[S Scalar, V Vec4like[S]](v, onNormal V) Vec4g[S] {
 	va := Vec4g[S](v)
-	vn := Vec4g[S](onNormal).Normalize()
+	vn := Normalize4(onNormal)
 	return vn.Scale(Dot4(va, vn))
 }
 
@@ -310,15 +310,15 @@ func Cross3[S Scalar, V Vec3like[S]](a, b V) Vec3g[S] {
 
 // Slerp3 spherically interpolates between a and b by t.
 func Slerp3[S Scalar, V Vec3like[S]](a, b V, t float64) Vec3g[S] {
-	va := Vec3g[S](a).Normalize()
-	vb := Vec3g[S](b).Normalize()
+	va := Normalize3(a)
+	vb := Normalize3(b)
 
 	dot := float64(Dot3(va, vb))
 
 	// Clamp dot product to avoid numerical errors
 	if dot > 0.9995 {
 		// Vectors are very close, use linear interpolation
-		return Lerp3(va, vb, t).Normalize()
+		return Normalize3(Lerp3(va, vb, t))
 	}
 
 	if dot < -1 {
@@ -332,7 +332,7 @@ func Slerp3[S Scalar, V Vec3like[S]](a, b V, t float64) Vec3g[S] {
 
 	if sinTheta < 0.001 {
 		// Vectors are parallel, use linear interpolation
-		return Lerp3(va, vb, t).Normalize()
+		return Normalize3(Lerp3(va, vb, t))
 	}
 
 	a1 := math.Sin((1-t)*theta) / sinTheta
@@ -415,6 +415,78 @@ func Apply4[S Scalar, V Vec4like[S]](v V, f func(S, S, S, S) (S, S, S, S)) Vec4g
 	return Vec4g[S]{x, y, z, w}
 }
 
+// LenSq2 returns the squared length of a 2D vector.
+func LenSq2[S Scalar, V Vec2like[S]](v V) S {
+	va := Vec2g[S](v)
+	return va.X*va.X + va.Y*va.Y
+}
+
+// LenSq3 returns the squared length of a 3D vector.
+func LenSq3[S Scalar, V Vec3like[S]](v V) S {
+	va := Vec3g[S](v)
+	return va.X*va.X + va.Y*va.Y + va.Z*va.Z
+}
+
+// LenSq4 returns the squared length of a 4D vector.
+func LenSq4[S Scalar, V Vec4like[S]](v V) S {
+	va := Vec4g[S](v)
+	return va.X*va.X + va.Y*va.Y + va.Z*va.Z + va.W*va.W
+}
+
+// Len2 returns the length of a 2D vector.
+func Len2[S Scalar, V Vec2like[S]](v V) float64 {
+	va := Vec2g[S](v)
+	return math.Sqrt(float64(va.X*va.X + va.Y*va.Y))
+}
+
+// Len3 returns the length of a 3D vector.
+func Len3[S Scalar, V Vec3like[S]](v V) float64 {
+	va := Vec3g[S](v)
+	return math.Sqrt(float64(va.X*va.X + va.Y*va.Y + va.Z*va.Z))
+}
+
+// Len4 returns the length of a 4D vector.
+func Len4[S Scalar, V Vec4like[S]](v V) float64 {
+	va := Vec4g[S](v)
+	return math.Sqrt(float64(va.X*va.X + va.Y*va.Y + va.Z*va.Z + va.W*va.W))
+}
+
+// Angle2 returns the angle of a 2D vector in radians.
+func Angle2[S Scalar, V Vec2like[S]](v V) float64 {
+	va := Vec2g[S](v)
+	return math.Atan2(float64(va.Y), float64(va.X))
+}
+
+// Normalize2 returns the unit vector of a 2D vector.
+func Normalize2[S Scalar, V Vec2like[S]](v V) Vec2g[S] {
+	va := Vec2g[S](v)
+	l := Len2(va)
+	if l == 0 {
+		return Vec2g[S]{0, 0}
+	}
+	return Vec2g[S]{va.X / S(l), va.Y / S(l)}
+}
+
+// Normalize3 returns the unit vector of a 3D vector.
+func Normalize3[S Scalar, V Vec3like[S]](v V) Vec3g[S] {
+	va := Vec3g[S](v)
+	l := Len3(va)
+	if l == 0 {
+		return Vec3g[S]{0, 0, 0}
+	}
+	return Vec3g[S]{va.X / S(l), va.Y / S(l), va.Z / S(l)}
+}
+
+// Normalize4 returns the unit vector of a 4D vector.
+func Normalize4[S Scalar, V Vec4like[S]](v V) Vec4g[S] {
+	va := Vec4g[S](v)
+	l := Len4(va)
+	if l == 0 {
+		return Vec4g[S]{0, 0, 0, 0}
+	}
+	return Vec4g[S]{va.X / S(l), va.Y / S(l), va.Z / S(l), va.W / S(l)}
+}
+
 // ===================
 // Math API (methods)
 // The arithmetic operations, comparisons, and operations on
@@ -454,23 +526,8 @@ func (a Vec2g[S]) Neg() Vec2g[S] { return Vec2g[S]{-a.X, -a.Y} }
 // Eq returns whether a equals b.
 func (a Vec2g[S]) Eq(b Vec2g[S]) bool { return a.X == b.X && a.Y == b.Y }
 
-// LenSq returns the squared length.
-func (a Vec2g[S]) LenSq() S { return a.X*a.X + a.Y*a.Y }
-
-// Len returns the length.
-func (a Vec2g[S]) Len() float64 { return math.Sqrt(float64(a.X*a.X + a.Y*a.Y)) }
-
-// Angle returns the angle in radians.
-func (a Vec2g[S]) Angle() float64 { return math.Atan2(float64(a.Y), float64(a.X)) }
-
-// Normalize returns the unit vector.
-func (a Vec2g[S]) Normalize() Vec2g[S] {
-	l := a.Len()
-	if l == 0 {
-		return Vec2g[S]{0, 0}
-	}
-	return Vec2g[S]{a.X / S(l), a.Y / S(l)}
-}
+// Eqs returns whether all components equal s.
+func (a Vec2g[S]) Eqs(s S) bool { return a.X == s && a.Y == s }
 
 // Scale is an alias for Muls.
 func (a Vec2g[S]) Scale(s S) Vec2g[S] { return Vec2g[S]{a.X * s, a.Y * s} }
@@ -528,23 +585,9 @@ func (a Vec3g[S]) Eq(b Vec3g[S]) bool {
 	return a.X == b.X && a.Y == b.Y && a.Z == b.Z
 }
 
-// LenSq returns the squared length.
-func (a Vec3g[S]) LenSq() S {
-	return a.X*a.X + a.Y*a.Y + a.Z*a.Z
-}
-
-// Len returns the length.
-func (a Vec3g[S]) Len() float64 {
-	return math.Sqrt(float64(a.X*a.X + a.Y*a.Y + a.Z*a.Z))
-}
-
-// Normalize returns the unit vector.
-func (a Vec3g[S]) Normalize() Vec3g[S] {
-	l := a.Len()
-	if l == 0 {
-		return Vec3g[S]{0, 0, 0}
-	}
-	return Vec3g[S]{a.X / S(l), a.Y / S(l), a.Z / S(l)}
+// Eqs returns whether all components equal s.
+func (a Vec3g[S]) Eqs(s S) bool {
+	return a.X == s && a.Y == s && a.Z == s
 }
 
 // Scale is an alias for Muls.
@@ -604,23 +647,9 @@ func (a Vec4g[S]) Eq(b Vec4g[S]) bool {
 	return a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W
 }
 
-// LenSq returns the squared length.
-func (a Vec4g[S]) LenSq() S {
-	return a.X*a.X + a.Y*a.Y + a.Z*a.Z + a.W*a.W
-}
-
-// Len returns the length.
-func (a Vec4g[S]) Len() float64 {
-	return math.Sqrt(float64(a.X*a.X + a.Y*a.Y + a.Z*a.Z + a.W*a.W))
-}
-
-// Normalize returns the unit vector.
-func (a Vec4g[S]) Normalize() Vec4g[S] {
-	l := a.Len()
-	if l == 0 {
-		return Vec4g[S]{0, 0, 0, 0}
-	}
-	return Vec4g[S]{a.X / S(l), a.Y / S(l), a.Z / S(l), a.W / S(l)}
+// Eqs returns whether all components equal s.
+func (a Vec4g[S]) Eqs(s S) bool {
+	return a.X == s && a.Y == s && a.Z == s && a.W == s
 }
 
 // Scale is an alias for Muls.

@@ -54,10 +54,10 @@ func Example_geometryAndTransformations() {
 	v2 := vec.Vec2{1, 0}
 
 	fmt.Println("Geometric operations:")
-	fmt.Printf("Length of %v = %.2f\n", v1, v1.Len())
-	fmt.Printf("Squared length = %.0f\n", v1.LenSq())
-	fmt.Printf("Normalized = %v\n", v1.Normalize())
-	fmt.Printf("Angle = %.2f radians\n", v1.Angle())
+	fmt.Printf("Length of %v = %.2f\n", v1, vec.Len2(v1))
+	fmt.Printf("Squared length = %.0f\n", vec.LenSq2(v1))
+	fmt.Printf("Normalized = %v\n", vec.Normalize2(v1))
+	fmt.Printf("Angle = %.2f radians\n", vec.Angle2(v1))
 
 	// Dot and cross products
 	fmt.Println("\nDot and cross products:")
