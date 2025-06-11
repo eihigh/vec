@@ -62,7 +62,7 @@ func Example_geometryAndTransformations() {
 	// Dot and cross products
 	fmt.Println("\nDot and cross products:")
 	fmt.Printf("Dot product = %.0f\n", vec.Dot2(v1, v2))
-	fmt.Printf("Cross product (2D) = %.0f\n", vec.Cross2(v1, v2))
+	fmt.Printf("Cross product (2D) = %v\n", vec.Cross2(v1, v2))
 
 	// 3D operations
 	v3 := vec.Vec3{1, 2, 3}
@@ -114,15 +114,16 @@ func Example_constructorsAndUtilities() {
 	// Constructors
 	fmt.Println("Constructors:")
 	fmt.Printf("New2(3, 4) = %v\n", vec.New2(3, 4))
+	fmt.Printf("NewAs2[int](3.4, 5.6) = %v\n", vec.NewAs2[int](3.4, 5.6))
 	fmt.Printf("Splat2(5) = %v\n", vec.Splat2(5))
 
 	// Type conversions
 	v := vec.Vec2{-3.7, 4.2}
 	fmt.Println("\nType conversions:")
 	fmt.Printf("Original: %v\n", v)
-	fmt.Printf("To int: %v\n", v.Int())
-	fmt.Printf("To float32: %v\n", v.Float32())
-	fmt.Printf("To uint8: %v\n", vec.Cast2[uint8](v))
+	fmt.Printf("To int: %v\n", vec.As2[int](v))
+	fmt.Printf("To float32: %v\n", vec.As2[float32](v))
+	fmt.Printf("To uint8: %v\n", vec.As2[uint8](v))
 
 	// Dimension conversions
 	v2 := vec.Vec2{1, 2}
@@ -133,8 +134,8 @@ func Example_constructorsAndUtilities() {
 
 	// Array/slice conversions
 	fmt.Println("\nArray/slice conversions:")
-	fmt.Printf("To array: %v\n", v2.Array())
-	fmt.Printf("To slice: %v\n", v2.Slice())
+	fmt.Printf("To array: %v\n", vec.ToArray2(v2))
+	fmt.Printf("To slice: %v\n", vec.ToSlice2(v2))
 	x, y := v2.XY()
 	fmt.Printf("Components: x=%v, y=%v\n", x, y)
 
@@ -156,6 +157,7 @@ func Example_constructorsAndUtilities() {
 	// Output:
 	// Constructors:
 	// New2(3, 4) = {3 4}
+	// NewAs2[int](3.4, 5.6) = {3 5}
 	// Splat2(5) = {5 5}
 	//
 	// Type conversions:

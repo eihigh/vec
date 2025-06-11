@@ -22,41 +22,11 @@ vi := vec.Vec2i{10, 20}  // int vectors
 vf := vec.Vec2g[float32]{10.5, 20.5} // generic vectors
 ```
 
-## Features
+## Interoperability
 
-### Functional Composition
+### Any Vector Types
 
-Transform vectors with any function using `Map`, `Zip`, and `Apply`:
-
-```go
-v := vec.Vec2{-1.5, 2.7}
-vec.Map2(v, math.Abs)    // {1.5, 2.7}
-vec.Map2(v, math.Floor)  // {-2, 2}
-
-a := vec.Vec2{10, 20}
-b := vec.Vec2{3, 7}
-vec.Zip2(a, b, math.Max)  // {10, 20}
-
-rgb := vec.Vec3g[uint8]{255, 128, 64}
-vec.Apply3(rgb, color.RGBToYCbCr) // {159 75 197}
-```
-
-### Component Unpacking
-
-Pass vector components directly to multi-argument functions:
-
-```go
-v := vec.Vec2{3, 4}
-hypot := math.Hypot(v.XY())  // 5.0
-
-// Works with any function expecting x, y
-func drawPoint(x, y float64) { /* ... */ }
-drawPoint(v.XY())
-```
-
-### Type Interoperability
-
-Package functions accept any struct with matching components:
+Package functions work seamlessly with any vector types from any package:
 
 ```go
 import "image"
@@ -64,64 +34,56 @@ import "image"
 p := image.Point{X: 10, Y: 20}
 q := image.Point{X: 3, Y: 4}
 
-// Use standard library types with vec functions
-d := vec.Dot2(p, q)  // 110
+// Use image.Point directly with vec functions
+d := vec.Dot2(p, q) // 110
 ```
 
-## Notes
+### Flexible Type Conversions
 
-### Methods vs Package Functions
-
-Operations that correspond to operators are methods (with both vector and scalar versions), while other operations are package functions:
+Create and convert vectors between different numeric types:
 
 ```go
-// Methods: operator-like operations
-v.Add(w)   // vector + vector
-v.Adds(5)  // vector + scalar
-v.Eq(w)    // vector == vector
-v.Eqs(0)   // all components == scalar
+// Basic constructors
+v1 := vec.New2(3.14, 2.71)           // vec.Vec2{3.14, 2.71}
+v2 := vec.New3(1, 2, 3)              // vec.Vec3i{1, 2, 3}
 
-// Package functions: properties and multi-vector operations
-vec.Len2(v)        // length
-vec.Normalize2(v)  // normalization
-vec.Dot2(a, b)     // dot product
-vec.Cross3(a, b)   // cross product
+// Type conversion during construction
+vi := vec.NewAs2[int](3.14, 2.71)    // vec.Vec2i{3, 2}
+vf := vec.NewAs3[float32](1, 2, 3)   // vec.Vec3g[float32]{1, 2, 3}
+
+// Convert existing vectors
+p := image.Point{X: 10, Y: 20}
+vec.As2[float32](p) // vec.Vec2g[float32]{10, 20}
 ```
 
-### Scalar Operations with "s" Suffix
+### Component Access and Integration
 
-Operations with scalars require an "s" suffix:
+Unpack vector components for use with any function:
 
 ```go
-v.Add(w)   // vector + vector
-v.Adds(5)  // vector + scalar (adds to each component)
+v := vec.Vec2{3, 4}
 
-v.Mul(w)   // component-wise multiplication (Hadamard product)
-v.Muls(5)  // scalar multiplication (or use v.Scale(5))
+// Unpack for multi-argument functions
+hypot := math.Hypot(v.XY())  // 5.0
+
+// Works with any function signature
+func drawPoint(x, y float64) { /* ... */ }
+drawPoint(v.XY())
 ```
 
-### Mul is Component-wise
+### Scalar Operations
 
-`Mul` performs component-wise multiplication, not scalar multiplication:
+Perform arithmetic operations with scalars on all components:
 
 ```go
-a := vec.Vec2{2, 3}
-b := vec.Vec2{4, 5}
-a.Mul(b)  // {8, 15} - NOT scalar multiplication
-a.Muls(2) // {4, 6}  - scalar multiplication
+v := vec.Vec2{3, 4}
+
+v.Adds(10)  // {13, 14} - add scalar to all components
+v.Muls(2)   // {6, 8}   - multiply all components by scalar
+v.Divs(2)   // {1.5, 2} - divide all components by scalar
 ```
 
-### Cross2 Returns Scalar
-
-The 2D cross product returns a scalar (signed area):
-
-```go
-a := vec.Vec2{3, 0}
-b := vec.Vec2{0, 4}
-vec.Cross2(a, b)  // returns 12.0 (float64)
-```
-
-## Examples
+## Quick Reference
 
 ### Arithmetic Operations
 
@@ -144,6 +106,7 @@ a.Divs(2)  // {5, 10}
 // Other
 a.Neg()    // {-10, -20}
 a.Eq(b)    // false
+a.Eqs(10)  // false
 ```
 
 ### Geometry and Transformations
@@ -175,11 +138,9 @@ vec.Reflect2(v, normal)  // reflect v off surface
 ```go
 // Type conversions
 v := vec.Vec2{3.7, 4.2}
-v.Int()     // vec.Vec2i{3, 4}
-v.Float32() // vec.Vec2g[float32]{3.7, 4.2}
-
-// Generic vector conversions
-vec.Cast2[uint8](v) // vec.Vec2g[uint8]{3, 4}
+vec.As2[int](v)     // vec.Vec2i{3, 4}
+vec.As2[float32](v) // vec.Vec2g[float32]{3.7, 4.2}
+vec.As2[uint8](v)   // vec.Vec2g[uint8]{3, 4}
 
 // Dimension conversions
 v2 := vec.Vec2{1, 2}
@@ -189,9 +150,27 @@ v3 := vec.Vec3{3, 4, 5}
 v3.Vec2()   // vec.Vec2{3, 4}
 
 // Array/slice conversions
-v.Array()  // [2]float64{3.7, 4.2}
-v.Slice()  // []float64{3.7, 4.2}
-x, y := v.XY()  // 3.7, 4.2
+vec.ToArray2(v)  // [2]float64{3.7, 4.2}
+vec.ToSlice2(v)  // []float64{3.7, 4.2}
+x, y := v.XY()   // 3.7, 4.2
+```
+
+### Functional Operations
+
+```go
+// Map: apply function to each component
+v := vec.Vec2{-1.5, 2.7}
+vec.Map2(v, math.Abs)    // {1.5, 2.7}
+vec.Map2(v, math.Floor)  // {-2, 2}
+
+// Zip: combine two vectors with a function
+a := vec.Vec2{10, 20}
+b := vec.Vec2{3, 7}
+vec.Zip2(a, b, math.Max)  // {10, 20}
+
+// Apply: transform all components at once
+rgb := vec.Vec3g[uint8]{255, 128, 64}
+vec.Apply3(rgb, color.RGBToYCbCr) // {159 75 197}
 ```
 
 ## Types

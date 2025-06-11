@@ -67,6 +67,19 @@ func New3[S Scalar](x, y, z S) Vec3g[S] { return Vec3g[S]{x, y, z} }
 // New4 creates a 4D vector from x, y, z, w components.
 func New4[S Scalar](x, y, z, w S) Vec4g[S] { return Vec4g[S]{x, y, z, w} }
 
+// NewAs2 creates a 2D vector from x, y components of type In, returning type Out.
+func NewAs2[Out, In Scalar](x, y In) Vec2g[Out] { return Vec2g[Out]{Out(x), Out(y)} }
+
+// NewAs3 creates a 3D vector from x, y, z components of type In, returning type Out.
+func NewAs3[Out, In Scalar](x, y, z In) Vec3g[Out] {
+	return Vec3g[Out]{Out(x), Out(y), Out(z)}
+}
+
+// NewAs4 creates a 4D vector from x, y, z, w components of type In, returning type Out.
+func NewAs4[Out, In Scalar](x, y, z, w In) Vec4g[Out] {
+	return Vec4g[Out]{Out(x), Out(y), Out(z), Out(w)}
+}
+
 // Splat2 creates a 2D vector with all components set to x.
 func Splat2[S Scalar](x S) Vec2g[S] { return Vec2g[S]{x, x} }
 
@@ -76,22 +89,58 @@ func Splat3[S Scalar](x S) Vec3g[S] { return Vec3g[S]{x, x, x} }
 // Splat4 creates a 4D vector with all components set to x.
 func Splat4[S Scalar](x S) Vec4g[S] { return Vec4g[S]{x, x, x, x} }
 
-// Cast2 converts a 2D vector from type S to type T.
-func Cast2[T, S Scalar, V Vec2like[S]](v V) Vec2g[T] {
+// As2 converts a 2D vector from type In to type Out.
+func As2[Out, In Scalar, V Vec2like[In]](v V) Vec2g[Out] {
+	vv := Vec2g[In](v)
+	return Vec2g[Out]{Out(vv.X), Out(vv.Y)}
+}
+
+// As3 converts a 3D vector from type In to type Out.
+func As3[Out, In Scalar, V Vec3like[In]](v V) Vec3g[Out] {
+	vv := Vec3g[In](v)
+	return Vec3g[Out]{Out(vv.X), Out(vv.Y), Out(vv.Z)}
+}
+
+// As4 converts a 4D vector from type In to type Out.
+func As4[Out, In Scalar, V Vec4like[In]](v V) Vec4g[Out] {
+	vv := Vec4g[In](v)
+	return Vec4g[Out]{Out(vv.X), Out(vv.Y), Out(vv.Z), Out(vv.W)}
+}
+
+// ToArray2 returns components as array.
+func ToArray2[V Vec2like[S], S Scalar](v V) [2]S {
 	vv := Vec2g[S](v)
-	return Vec2g[T]{T(vv.X), T(vv.Y)}
+	return [2]S{vv.X, vv.Y}
 }
 
-// Cast3 converts a 3D vector from type S to type T.
-func Cast3[T, S Scalar, V Vec3like[S]](v V) Vec3g[T] {
+// ToArray3 returns components as array.
+func ToArray3[V Vec3like[S], S Scalar](v V) [3]S {
 	vv := Vec3g[S](v)
-	return Vec3g[T]{T(vv.X), T(vv.Y), T(vv.Z)}
+	return [3]S{vv.X, vv.Y, vv.Z}
 }
 
-// Cast4 converts a 4D vector from type S to type T.
-func Cast4[T, S Scalar, V Vec4like[S]](v V) Vec4g[T] {
+// ToArray4 returns components as array.
+func ToArray4[V Vec4like[S], S Scalar](v V) [4]S {
 	vv := Vec4g[S](v)
-	return Vec4g[T]{T(vv.X), T(vv.Y), T(vv.Z), T(vv.W)}
+	return [4]S{vv.X, vv.Y, vv.Z, vv.W}
+}
+
+// ToSlice2 returns components as slice.
+func ToSlice2[V Vec2like[S], S Scalar](v V) []S {
+	vv := Vec2g[S](v)
+	return []S{vv.X, vv.Y}
+}
+
+// ToSlice3 returns components as slice.
+func ToSlice3[V Vec3like[S], S Scalar](v V) []S {
+	vv := Vec3g[S](v)
+	return []S{vv.X, vv.Y, vv.Z}
+}
+
+// ToSlice4 returns components as slice.
+func ToSlice4[V Vec4like[S], S Scalar](v V) []S {
+	vv := Vec4g[S](v)
+	return []S{vv.X, vv.Y, vv.Z, vv.W}
 }
 
 // XY returns the x, y components.
@@ -121,204 +170,152 @@ func (a Vec4g[S]) Vec2() Vec2g[S] { return Vec2g[S]{a.X, a.Y} }
 // Vec3 truncates to 3D.
 func (a Vec4g[S]) Vec3() Vec3g[S] { return Vec3g[S]{a.X, a.Y, a.Z} }
 
-// Int converts to int vector.
-func (a Vec2g[S]) Int() Vec2g[int] { return Vec2g[int]{int(a.X), int(a.Y)} }
-
-// Int converts to int vector.
-func (a Vec3g[S]) Int() Vec3g[int] { return Vec3g[int]{int(a.X), int(a.Y), int(a.Z)} }
-
-// Int converts to int vector.
-func (a Vec4g[S]) Int() Vec4g[int] { return Vec4g[int]{int(a.X), int(a.Y), int(a.Z), int(a.W)} }
-
-// Uint converts to uint vector.
-func (a Vec2g[S]) Uint() Vec2g[uint] { return Vec2g[uint]{uint(a.X), uint(a.Y)} }
-
-// Uint converts to uint vector.
-func (a Vec3g[S]) Uint() Vec3g[uint] { return Vec3g[uint]{uint(a.X), uint(a.Y), uint(a.Z)} }
-
-// Uint converts to uint vector.
-func (a Vec4g[S]) Uint() Vec4g[uint] { return Vec4g[uint]{uint(a.X), uint(a.Y), uint(a.Z), uint(a.W)} }
-
-// Float64 converts to float64 vector.
-func (a Vec2g[S]) Float64() Vec2g[float64] {
-	return Vec2g[float64]{float64(a.X), float64(a.Y)}
-}
-
-// Float64 converts to float64 vector.
-func (a Vec3g[S]) Float64() Vec3g[float64] {
-	return Vec3g[float64]{float64(a.X), float64(a.Y), float64(a.Z)}
-}
-
-// Float64 converts to float64 vector.
-func (a Vec4g[S]) Float64() Vec4g[float64] {
-	return Vec4g[float64]{float64(a.X), float64(a.Y), float64(a.Z), float64(a.W)}
-}
-
-// Float32 converts to float32 vector.
-func (a Vec2g[S]) Float32() Vec2g[float32] {
-	return Vec2g[float32]{float32(a.X), float32(a.Y)}
-}
-
-// Float32 converts to float32 vector.
-func (a Vec3g[S]) Float32() Vec3g[float32] {
-	return Vec3g[float32]{float32(a.X), float32(a.Y), float32(a.Z)}
-}
-
-// Float32 converts to float32 vector.
-func (a Vec4g[S]) Float32() Vec4g[float32] {
-	return Vec4g[float32]{float32(a.X), float32(a.Y), float32(a.Z), float32(a.W)}
-}
-
-// Array returns components as array.
-func (a Vec2g[S]) Array() [2]S { return [2]S{a.X, a.Y} }
-
-// Array returns components as array.
-func (a Vec3g[S]) Array() [3]S { return [3]S{a.X, a.Y, a.Z} }
-
-// Array returns components as array.
-func (a Vec4g[S]) Array() [4]S { return [4]S{a.X, a.Y, a.Z, a.W} }
-
-// Slice returns components as slice.
-func (a Vec2g[S]) Slice() []S { return []S{a.X, a.Y} }
-
-// Slice returns components as slice.
-func (a Vec3g[S]) Slice() []S { return []S{a.X, a.Y, a.Z} }
-
-// Slice returns components as slice.
-func (a Vec4g[S]) Slice() []S { return []S{a.X, a.Y, a.Z, a.W} }
-
 // ===================
 // Math API (package functions)
 // Multiple vector operations are defined as global functions.
 // ===================
 
 // Dot2 returns the dot product of two 2D vectors.
-func Dot2[S Scalar, V Vec2like[S]](a, b V) S {
+func Dot2[V1, V2 Vec2like[S], S Scalar](a V1, b V2) S {
 	va := Vec2g[S](a)
 	vb := Vec2g[S](b)
 	return va.X*vb.X + va.Y*vb.Y
 }
 
 // Dot3 returns the dot product of two 3D vectors.
-func Dot3[S Scalar, V Vec3like[S]](a, b V) S {
+func Dot3[V1, V2 Vec3like[S], S Scalar](a V1, b V2) S {
 	va := Vec3g[S](a)
 	vb := Vec3g[S](b)
 	return va.X*vb.X + va.Y*vb.Y + va.Z*vb.Z
 }
 
 // Dot4 returns the dot product of two 4D vectors.
-func Dot4[S Scalar, V Vec4like[S]](a, b V) S {
+func Dot4[V1, V2 Vec4like[S], S Scalar](a V1, b V2) S {
 	va := Vec4g[S](a)
 	vb := Vec4g[S](b)
 	return va.X*vb.X + va.Y*vb.Y + va.Z*vb.Z + va.W*vb.W
 }
 
 // Lerp2 linearly interpolates between a and b by t.
-func Lerp2[S Scalar, V Vec2like[S]](a, b V, t float64) Vec2g[S] {
+func Lerp2[V1, V2 Vec2like[S], S Scalar](a V1, b V2, t float64) V1 {
 	va := Vec2g[S](a)
 	vb := Vec2g[S](b)
-	return Vec2g[S]{
+	return V1(Vec2g[S]{
 		X: S(float64(va.X) + (float64(vb.X)-float64(va.X))*t),
 		Y: S(float64(va.Y) + (float64(vb.Y)-float64(va.Y))*t),
-	}
+	})
 }
 
 // Lerp3 linearly interpolates between a and b by t.
-func Lerp3[S Scalar, V Vec3like[S]](a, b V, t float64) Vec3g[S] {
+func Lerp3[V1, V2 Vec3like[S], S Scalar](a V1, b V2, t float64) V1 {
 	va := Vec3g[S](a)
 	vb := Vec3g[S](b)
-	return Vec3g[S]{
+	return V1(Vec3g[S]{
 		X: S(float64(va.X) + (float64(vb.X)-float64(va.X))*t),
 		Y: S(float64(va.Y) + (float64(vb.Y)-float64(va.Y))*t),
 		Z: S(float64(va.Z) + (float64(vb.Z)-float64(va.Z))*t),
-	}
+	})
 }
 
 // Lerp4 linearly interpolates between a and b by t.
-func Lerp4[S Scalar, V Vec4like[S]](a, b V, t float64) Vec4g[S] {
+func Lerp4[V1, V2 Vec4like[S], S Scalar](a V1, b V2, t float64) V1 {
 	va := Vec4g[S](a)
 	vb := Vec4g[S](b)
-	return Vec4g[S]{
+	return V1(Vec4g[S]{
 		X: S(float64(va.X) + (float64(vb.X)-float64(va.X))*t),
 		Y: S(float64(va.Y) + (float64(vb.Y)-float64(va.Y))*t),
 		Z: S(float64(va.Z) + (float64(vb.Z)-float64(va.Z))*t),
 		W: S(float64(va.W) + (float64(vb.W)-float64(va.W))*t),
-	}
+	})
 }
 
 // Project2 projects v onto onNormal.
-func Project2[S Scalar, V Vec2like[S]](v, onNormal V) Vec2g[S] {
+func Project2[V1, V2 Vec2like[S], S Scalar](v V1, onNormal V2) V1 {
 	va := Vec2g[S](v)
-	vn := Normalize2(onNormal)
-	return vn.Scale(Dot2(va, vn))
+	vn := Vec2g[S](Normalize2(onNormal))
+	return V1(vn.Scale(Dot2(va, vn)))
 }
 
 // Project3 projects v onto onNormal.
-func Project3[S Scalar, V Vec3like[S]](v, onNormal V) Vec3g[S] {
+func Project3[V1, V2 Vec3like[S], S Scalar](v V1, onNormal V2) V1 {
 	va := Vec3g[S](v)
-	vn := Normalize3(onNormal)
-	return vn.Scale(Dot3(va, vn))
+	vn := Vec3g[S](Normalize3(onNormal))
+	return V1(vn.Scale(Dot3(va, vn)))
 }
 
 // Project4 projects v onto onNormal.
-func Project4[S Scalar, V Vec4like[S]](v, onNormal V) Vec4g[S] {
+func Project4[V1, V2 Vec4like[S], S Scalar](v V1, onNormal V2) V1 {
 	va := Vec4g[S](v)
-	vn := Normalize4(onNormal)
-	return vn.Scale(Dot4(va, vn))
+	vn := Vec4g[S](Normalize4(onNormal))
+	return V1(vn.Scale(Dot4(va, vn)))
 }
 
 // Reflect2 reflects v off the surface with normal n.
-func Reflect2[S Scalar, V Vec2like[S]](v, normal V) Vec2g[S] {
+func Reflect2[V1, V2 Vec2like[S], S Scalar](v V1, normal V2) V1 {
 	va := Vec2g[S](v)
-	vn := Vec2g[S](normal)
+	vn := Vec2g[S](Normalize2(normal))
 	dot := Dot2(va, vn)
-	return Vec2g[S]{
+	return V1(Vec2g[S]{
 		X: va.X - S(2*float64(dot)*float64(vn.X)),
 		Y: va.Y - S(2*float64(dot)*float64(vn.Y)),
-	}
+	})
 }
 
 // Reflect3 reflects v off the surface with normal n.
-func Reflect3[S Scalar, V Vec3like[S]](v, normal V) Vec3g[S] {
+func Reflect3[V1, V2 Vec3like[S], S Scalar](v V1, normal V2) V1 {
 	va := Vec3g[S](v)
-	vn := Vec3g[S](normal)
+	vn := Vec3g[S](Normalize3(normal))
 	dot := Dot3(va, vn)
-	return Vec3g[S]{
+	return V1(Vec3g[S]{
 		X: va.X - S(2*float64(dot)*float64(vn.X)),
 		Y: va.Y - S(2*float64(dot)*float64(vn.Y)),
 		Z: va.Z - S(2*float64(dot)*float64(vn.Z)),
-	}
+	})
 }
 
-// Cross2 returns the 2D cross product (scalar).
-func Cross2[S Scalar, V Vec2like[S]](a, b V) float64 {
+// Reflect4 reflects v off the surface with normal n.
+func Reflect4[V1, V2 Vec4like[S], S Scalar](v V1, normal V2) V1 {
+	va := Vec4g[S](v)
+	vn := Vec4g[S](Normalize4(normal))
+	dot := Dot4(va, vn)
+	return V1(Vec4g[S]{
+		X: va.X - S(2*float64(dot)*float64(vn.X)),
+		Y: va.Y - S(2*float64(dot)*float64(vn.Y)),
+		Z: va.Z - S(2*float64(dot)*float64(vn.Z)),
+		W: va.W - S(2*float64(dot)*float64(vn.W)),
+	})
+}
+
+// Cross2 returns the 2D cross product (determinant) of two vectors.
+func Cross2[V1, V2 Vec2like[S], S Scalar](a V1, b V2) S {
 	va := Vec2g[S](a)
 	vb := Vec2g[S](b)
-	return float64(va.X*vb.Y - va.Y*vb.X)
+	// 2D cross product is a scalar (determinant)
+	return va.X*vb.Y - va.Y*vb.X
 }
 
 // Cross3 returns the 3D cross product.
-func Cross3[S Scalar, V Vec3like[S]](a, b V) Vec3g[S] {
+func Cross3[V1, V2 Vec3like[S], S Scalar](a V1, b V2) V1 {
 	va := Vec3g[S](a)
 	vb := Vec3g[S](b)
-	return Vec3g[S]{
+	return V1(Vec3g[S]{
 		X: va.Y*vb.Z - va.Z*vb.Y,
 		Y: va.Z*vb.X - va.X*vb.Z,
 		Z: va.X*vb.Y - va.Y*vb.X,
-	}
+	})
 }
 
 // Slerp3 spherically interpolates between a and b by t.
-func Slerp3[S Scalar, V Vec3like[S]](a, b V, t float64) Vec3g[S] {
-	va := Normalize3(a)
-	vb := Normalize3(b)
+func Slerp3[V1, V2 Vec3like[S], S Scalar](a V1, b V2, t float64) V1 {
+	va := Vec3g[S](Normalize3(a))
+	vb := Vec3g[S](Normalize3(b))
 
 	dot := float64(Dot3(va, vb))
 
 	// Clamp dot product to avoid numerical errors
 	if dot > 0.9995 {
 		// Vectors are very close, use linear interpolation
-		return Normalize3(Lerp3(va, vb, t))
+		return Normalize3(Lerp3(a, b, t))
 	}
 
 	if dot < -1 {
@@ -332,165 +329,168 @@ func Slerp3[S Scalar, V Vec3like[S]](a, b V, t float64) Vec3g[S] {
 
 	if sinTheta < 0.001 {
 		// Vectors are parallel, use linear interpolation
-		return Normalize3(Lerp3(va, vb, t))
+		return Normalize3(Lerp3(a, b, t))
 	}
 
 	a1 := math.Sin((1-t)*theta) / sinTheta
 	b1 := math.Sin(t*theta) / sinTheta
 
-	return Vec3g[S]{
+	return V1(Vec3g[S]{
 		X: S(float64(va.X)*a1 + float64(vb.X)*b1),
 		Y: S(float64(va.Y)*a1 + float64(vb.Y)*b1),
 		Z: S(float64(va.Z)*a1 + float64(vb.Z)*b1),
-	}
+	})
 }
 
 // Rotate2 rotates v by angle radians.
-func Rotate2[S Scalar, V Vec2like[S]](v V, angle float64) Vec2g[S] {
+func Rotate2[V Vec2like[S], S Scalar](v V, angle float64) V {
 	va := Vec2g[S](v)
 	sin, cos := math.Sincos(angle)
-	return Vec2g[S]{
+	return V(Vec2g[S]{
 		X: S(float64(va.X)*cos - float64(va.Y)*sin),
 		Y: S(float64(va.X)*sin + float64(va.Y)*cos),
-	}
+	})
 }
 
 // Map2 applies f to each component of a 2D vector.
-func Map2[S Scalar, V Vec2like[S]](v V, f func(S) S) Vec2g[S] {
+func Map2[V Vec2like[S], S Scalar](v V, f func(S) S) V {
 	va := Vec2g[S](v)
-	return Vec2g[S]{f(va.X), f(va.Y)}
+	return V(Vec2g[S]{f(va.X), f(va.Y)})
 }
 
 // Map3 applies f to each component of a 3D vector.
-func Map3[S Scalar, V Vec3like[S]](v V, f func(S) S) Vec3g[S] {
+func Map3[V Vec3like[S], S Scalar](v V, f func(S) S) V {
 	va := Vec3g[S](v)
-	return Vec3g[S]{f(va.X), f(va.Y), f(va.Z)}
+	return V(Vec3g[S]{f(va.X), f(va.Y), f(va.Z)})
 }
 
 // Map4 applies f to each component of a 4D vector.
-func Map4[S Scalar, V Vec4like[S]](v V, f func(S) S) Vec4g[S] {
+func Map4[V Vec4like[S], S Scalar](v V, f func(S) S) V {
 	va := Vec4g[S](v)
-	return Vec4g[S]{f(va.X), f(va.Y), f(va.Z), f(va.W)}
+	return V(Vec4g[S]{f(va.X), f(va.Y), f(va.Z), f(va.W)})
 }
 
 // Zip2 applies f to corresponding components of two 2D vectors.
-func Zip2[S Scalar, V Vec2like[S]](a, b V, f func(S, S) S) Vec2g[S] {
+func Zip2[V1, V2 Vec2like[S], S Scalar](a V1, b V2, f func(S, S) S) V1 {
 	va := Vec2g[S](a)
 	vb := Vec2g[S](b)
-	return Vec2g[S]{f(va.X, vb.X), f(va.Y, vb.Y)}
+	return V1(Vec2g[S]{f(va.X, vb.X), f(va.Y, vb.Y)})
 }
 
 // Zip3 applies f to corresponding components of two 3D vectors.
-func Zip3[S Scalar, V Vec3like[S]](a, b V, f func(S, S) S) Vec3g[S] {
+func Zip3[V1, V2 Vec3like[S], S Scalar](a V1, b V2, f func(S, S) S) V1 {
 	va := Vec3g[S](a)
 	vb := Vec3g[S](b)
-	return Vec3g[S]{f(va.X, vb.X), f(va.Y, vb.Y), f(va.Z, vb.Z)}
+	return V1(Vec3g[S]{f(va.X, vb.X), f(va.Y, vb.Y), f(va.Z, vb.Z)})
 }
 
 // Zip4 applies f to corresponding components of two 4D vectors.
-func Zip4[S Scalar, V Vec4like[S]](a, b V, f func(S, S) S) Vec4g[S] {
+func Zip4[V1, V2 Vec4like[S], S Scalar](a V1, b V2, f func(S, S) S) V1 {
 	va := Vec4g[S](a)
 	vb := Vec4g[S](b)
-	return Vec4g[S]{f(va.X, vb.X), f(va.Y, vb.Y), f(va.Z, vb.Z), f(va.W, vb.W)}
+	return V1(Vec4g[S]{f(va.X, vb.X), f(va.Y, vb.Y), f(va.Z, vb.Z), f(va.W, vb.W)})
 }
 
 // Apply2 transforms all components of a 2D vector at once.
-func Apply2[S Scalar, V Vec2like[S]](v V, f func(S, S) (S, S)) Vec2g[S] {
+func Apply2[V Vec2like[S], S Scalar](v V, f func(S, S) (S, S)) V {
 	va := Vec2g[S](v)
 	x, y := f(va.X, va.Y)
-	return Vec2g[S]{x, y}
+	return V(Vec2g[S]{x, y})
 }
 
 // Apply3 transforms all components of a 3D vector at once.
-func Apply3[S Scalar, V Vec3like[S]](v V, f func(S, S, S) (S, S, S)) Vec3g[S] {
+func Apply3[V Vec3like[S], S Scalar](v V, f func(S, S, S) (S, S, S)) V {
 	va := Vec3g[S](v)
 	x, y, z := f(va.X, va.Y, va.Z)
-	return Vec3g[S]{x, y, z}
+	return V(Vec3g[S]{x, y, z})
 }
 
 // Apply4 transforms all components of a 4D vector at once.
-func Apply4[S Scalar, V Vec4like[S]](v V, f func(S, S, S, S) (S, S, S, S)) Vec4g[S] {
+func Apply4[V Vec4like[S], S Scalar](v V, f func(S, S, S, S) (S, S, S, S)) V {
 	va := Vec4g[S](v)
 	x, y, z, w := f(va.X, va.Y, va.Z, va.W)
-	return Vec4g[S]{x, y, z, w}
+	return V(Vec4g[S]{x, y, z, w})
 }
 
 // LenSq2 returns the squared length of a 2D vector.
-func LenSq2[S Scalar, V Vec2like[S]](v V) S {
+func LenSq2[V Vec2like[S], S Scalar](v V) S {
 	va := Vec2g[S](v)
 	return va.X*va.X + va.Y*va.Y
 }
 
 // LenSq3 returns the squared length of a 3D vector.
-func LenSq3[S Scalar, V Vec3like[S]](v V) S {
+func LenSq3[V Vec3like[S], S Scalar](v V) S {
 	va := Vec3g[S](v)
 	return va.X*va.X + va.Y*va.Y + va.Z*va.Z
 }
 
 // LenSq4 returns the squared length of a 4D vector.
-func LenSq4[S Scalar, V Vec4like[S]](v V) S {
+func LenSq4[V Vec4like[S], S Scalar](v V) S {
 	va := Vec4g[S](v)
 	return va.X*va.X + va.Y*va.Y + va.Z*va.Z + va.W*va.W
 }
 
 // Len2 returns the length of a 2D vector.
-func Len2[S Scalar, V Vec2like[S]](v V) float64 {
+func Len2[V Vec2like[S], S Scalar](v V) float64 {
 	va := Vec2g[S](v)
 	return math.Sqrt(float64(va.X*va.X + va.Y*va.Y))
 }
 
 // Len3 returns the length of a 3D vector.
-func Len3[S Scalar, V Vec3like[S]](v V) float64 {
+func Len3[V Vec3like[S], S Scalar](v V) float64 {
 	va := Vec3g[S](v)
 	return math.Sqrt(float64(va.X*va.X + va.Y*va.Y + va.Z*va.Z))
 }
 
 // Len4 returns the length of a 4D vector.
-func Len4[S Scalar, V Vec4like[S]](v V) float64 {
+func Len4[V Vec4like[S], S Scalar](v V) float64 {
 	va := Vec4g[S](v)
 	return math.Sqrt(float64(va.X*va.X + va.Y*va.Y + va.Z*va.Z + va.W*va.W))
 }
 
 // Angle2 returns the angle of a 2D vector in radians.
-func Angle2[S Scalar, V Vec2like[S]](v V) float64 {
+func Angle2[V Vec2like[S], S Scalar](v V) float64 {
 	va := Vec2g[S](v)
 	return math.Atan2(float64(va.Y), float64(va.X))
 }
 
 // Normalize2 returns the unit vector of a 2D vector.
-func Normalize2[S Scalar, V Vec2like[S]](v V) Vec2g[S] {
+// Returns zero vector if the input has zero length.
+func Normalize2[V Vec2like[S], S Scalar](v V) V {
 	va := Vec2g[S](v)
 	l := Len2(va)
 	if l == 0 {
-		return Vec2g[S]{0, 0}
+		return V(Vec2g[S]{0, 0})
 	}
-	return Vec2g[S]{va.X / S(l), va.Y / S(l)}
+	return V(Vec2g[S]{va.X / S(l), va.Y / S(l)})
 }
 
 // Normalize3 returns the unit vector of a 3D vector.
-func Normalize3[S Scalar, V Vec3like[S]](v V) Vec3g[S] {
+// Returns zero vector if the input has zero length.
+func Normalize3[V Vec3like[S], S Scalar](v V) V {
 	va := Vec3g[S](v)
 	l := Len3(va)
 	if l == 0 {
-		return Vec3g[S]{0, 0, 0}
+		return V(Vec3g[S]{0, 0, 0})
 	}
-	return Vec3g[S]{va.X / S(l), va.Y / S(l), va.Z / S(l)}
+	return V(Vec3g[S]{va.X / S(l), va.Y / S(l), va.Z / S(l)})
 }
 
 // Normalize4 returns the unit vector of a 4D vector.
-func Normalize4[S Scalar, V Vec4like[S]](v V) Vec4g[S] {
+// Returns zero vector if the input has zero length.
+func Normalize4[V Vec4like[S], S Scalar](v V) V {
 	va := Vec4g[S](v)
 	l := Len4(va)
 	if l == 0 {
-		return Vec4g[S]{0, 0, 0, 0}
+		return V(Vec4g[S]{0, 0, 0, 0})
 	}
-	return Vec4g[S]{va.X / S(l), va.Y / S(l), va.Z / S(l), va.W / S(l)}
+	return V(Vec4g[S]{va.X / S(l), va.Y / S(l), va.Z / S(l), va.W / S(l)})
 }
 
 // ===================
 // Math API (methods)
-// The arithmetic operations, comparisons, and operations on
-// individual vectors (length, angle) are defined as methods.
+// Arithmetic operations, comparisons, dimension conversions,
+// and component unpacking are defined as methods.
 // ===================
 
 // Vec2
