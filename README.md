@@ -6,6 +6,12 @@ A Go vector math library with generic types.
 
 ## Quick Start
 
+`Vec2` is an alias for `Vec2g[float64]`. Other aliases include `Vec2i`, `Vec2u`.
+
+Basic arithmetic operations, comparisons, and type/size conversions are provided as methods, while other operations are available as global functions.
+
+As will be seen later, global functions accept vector types defined in any package, and type conversions are flexible.
+
 ```go
 import "github.com/eihigh/vec"
 
